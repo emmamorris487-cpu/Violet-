@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACB Caribbean Bank - Digital AI Assistant</title>
+  
+  <!-- Google Fonts (Poppins) & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       1. FINTECH BRANDING & VARIABLES (ACB ROYAL BLUE, GOLD, & SLATE)
+       ========================================================================== */
+    :root {
+      --primary-blue: #1E3A8A;
+      --primary-blue-dark: #0f2b66;
+      --primary-blue-light: #2563eb;
+      --gold-accent: #FFD700;
+      --gold-hover: #e6c200;
+      --bg-slate: #f8f9fa;
+      --card-bg: #ffffff;
+      --user-msg-bg: #f0f7ff;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --sidebar-width: 280px;
+      --sidebar-collapsed: 70px;
+      --transition-speed: 0.3s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-slate);
+      color: var(--text-dark);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ==========================================================================
+       2. SIDEBAR NAVIGATION
+       ========================================================================== */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: #ffffff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      transition: width var(--transition-speed) ease;
+      z-index: 100;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+    }
+
+    .sidebar-header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      color: white;
+      padding: 1.25rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 70px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #FFD700 0%, #f59e0b 100%);
+      color: #0f2b66;
+      font-weight: 800;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .logo-text h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold-accent);
+      line-height: 1.1;
+    }
+
+    .logo-text p {
+      font-size: 0.7rem;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+
+    .sidebar-toggle-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-body {
+      flex: 1;
+      padding: 1.25rem 0.75rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--primary-blue);
+      border-bottom: 2px solid var(--gold-accent);
+      padding-bottom: 4px;
+      margin-bottom: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed .section-title,
+    .sidebar.collapsed .sidebar-btn-text,
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .info-card {
+      display: none;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 0.65rem 0.75rem;
+      border-radius: 12px;
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .sidebar-btn:hover {
+      background-color: #f1f5f9;
+      color: var(--primary-blue);
+    }
+
+    .sidebar-btn.btn-danger {
+      color: #dc2626;
+    }
+
+    .sidebar-btn.btn-danger:hover {
+      background-color: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .sidebar-link:hover {
+      background-color: #f1f5f9;
+      color: var(--primary-blue);
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #fffbebe6 100%);
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      padding: 0.85rem;
+      font-size: 0.75rem;
+      color: #1e3a8a;
+      line-height: 1.4;
+      margin-top: auto;
+    }
+
+    .info-card i {
+      color: var(--primary-blue);
+      margin-right: 4px;
+    }
+
+    /* ==========================================================================
+       3. MAIN CHAT AREA
+       ========================================================================== */
+    .main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-wrapper {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Header Banner */
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+      border-radius: 20px;
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+      color: white;
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-header h1 {
+      color: var(--gold-accent);
+      font-weight: 800;
+      font-size: 1.75rem;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.3rem;
+    }
+
+    .chat-header p {
+      font-size: 0.85rem;
+      color: #e0e7ff;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .chat-header .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 43, 102, 0.6);
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      color: var(--gold-accent);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    /* Quick Action Pills */
+    .quick-actions-container {
+      margin-bottom: 1.25rem;
+    }
+
+    .quick-actions-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.65rem;
+    }
+
+    .quick-pill {
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 0.65rem 0.85rem;
+      border-radius: 16px;
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 0.825rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+      text-align: left;
+    }
+
+    .quick-pill i {
+      color: var(--primary-blue);
+      font-size: 0.9rem;
+    }
+
+    .quick-pill:hover {
+      background-color: #f0f7ff;
+      border-color: #93c5fd;
+      color: var(--primary-blue);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+    }
+
+    /* Messages Display Box */
+    .chat-messages {
+      flex: 1;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    /* Message Bubbles */
+    .chat-bubble {
+      max-width: 82%;
+      padding: 1rem 1.15rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      position: relative;
+      animation: fadeIn 0.25s ease-in-out;
+      border: 1px solid #f1f5f9;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-bubble.assistant {
+      align-self: flex-start;
+      background-color: #ffffff;
+      border-color: var(--border-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      color: var(--text-dark);
+    }
+
+    .chat-bubble.user {
+      align-self: flex-end;
+      background-color: var(--user-msg-bg);
+      border-color: #bfdbfe;
+      color: #0f172a;
+      font-weight: 500;
+    }
+
+    .bubble-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-size: 0.725rem;
+      color: var(--text-muted);
+    }
+
+    .bubble-author {
+      font-weight: 700;
+      color: var(--primary-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bubble-author .acb-mini-badge {
+      background: var(--primary-blue);
+      color: var(--gold-accent);
+      font-size: 0.625rem;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      background-color: var(--primary-blue);
+      margin-left: 4px;
+      animation: blink 0.8s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Input Controls */
+    .chat-input-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    }
+
+    .chat-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      background: transparent;
+      padding: 0.5rem;
+    }
+
+    .icon-btn {
+      background: #f1f5f9;
+      border: none;
+      color: var(--text-muted);
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: #e2e8f0;
+      color: var(--primary-blue);
+    }
+
+    .icon-btn.recording {
+      background: #ef4444;
+      color: white;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+      color: var(--gold-accent);
+      border: none;
+      padding: 0.75rem 1.4rem;
+      border-radius: 14px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(30, 58, 138, 0.35);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: absolute;
+        height: 100%;
+        left: -280px;
+      }
+      .sidebar.mobile-open {
+        left: 0;
+      }
+      .chat-wrapper {
+        padding: 1rem;
+      }
+      .chat-header h1 {
+        font-size: 1.4rem;
+      }
+      .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       SIDEBAR NAVIGATION
+       ========================================================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-badge">ACB</div>
+        <div class="logo-text">
+          <h2>ACB CARIBBEAN</h2>
+          <p>Digital Assistant</p>
+        </div>
+      </div>
+      <button class="sidebar-toggle-btn" id="toggleSidebar" title="Toggle Sidebar">
+        <i class="fa-solid fa-chevron-left" id="toggleIcon"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-body">
+      <!-- Support Tools -->
+      <div>
+        <p class="section-title">Support Tools</p>
+        <button class="sidebar-btn btn-danger" id="clearChatBtn">
+          <i class="fa-solid fa-trash-can"></i>
+          <span class="sidebar-btn-text">Clear Chat History</span>
+        </button>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <p class="section-title">Quick Links</p>
+        <a href="https://ebanking.acbcaribbean.com" target="_blank" class="sidebar-link">
+          <i class="fa-solid fa-lock" style="color: #1e3a8a;"></i>
+          <span class="sidebar-btn-text">Online Banking</span>
+        </a>
+        <a href="https://acbcaribbean.com" target="_blank" class="sidebar-link">
+          <i class="fa-solid fa-building-columns" style="color: #1e3a8a;"></i>
+          <span class="sidebar-btn-text">Branch Locator</span>
+        </a>
+        <a href="https://acbcaribbean.com/rates" target="_blank" class="sidebar-link">
+          <i class="fa-solid fa-percent" style="color: #d97706;"></i>
+          <span class="sidebar-btn-text">Interest Rates</span>
+        </a>
+      </div>
+
+      <!-- Security Notice -->
+      <div class="info-card">
+        <i class="fa-solid fa-shield-halved"></i>
+        <strong>Bank Security Notice:</strong>
+        <p style="margin-top: 4px;">I am an AI assistant. For urgent banking matters, please call our 24/7 hotline at <strong>1-800-222-2265</strong>.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       MAIN CHAT WORKSPACE
+       ========================================================================== -->
+  <main class="main-container">
+    <div class="chat-wrapper">
+      
+      <!-- Gradient Header Banner -->
+      <div class="chat-header">
+        <div class="badge">
+          <i class="fa-solid fa-sparkles"></i> Official AI Banking Assistant
+        </div>
+        <h1>ACB Caribbean Bank</h1>
+        <p>Digital Assistant • Secure • Reliable • Caribbean</p>
+      </div>
+
+      <!-- Quick Action Pills -->
+      <div class="quick-actions-container">
+        <div class="quick-actions-title">
+          <i class="fa-solid fa-bolt" style="color: #FFD700;"></i> Frequent Questions:
+        </div>
+        <div class="quick-actions-grid">
+          <button class="quick-pill" data-prompt="Tell me about home loans and mortgages">
+            <i class="fa-solid fa-house"></i> 🏠 Home Loans
+          </button>
+          <button class="quick-pill" data-prompt="Tell me about credit cards and debit cards">
+            <i class="fa-solid fa-credit-card"></i> 💳 Credit Cards
+          </button>
+          <button class="quick-pill" data-prompt="Where are your branches and what are opening hours?">
+            <i class="fa-solid fa-location-dot"></i> 📍 Locations
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Messages Display Box -->
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-bubble assistant">
+          <div class="bubble-header">
+            <span class="bubble-author">
+              <span class="acb-mini-badge">ACB</span> ACB Assistant
+            </span>
+            <span id="initialTime">12:00 PM</span>
+          </div>
+          <div class="bubble-content">
+            <p>Hi there! 👋 I'm your ACB Bank Assistant. How can I help you today?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Controls -->
+      <div class="chat-input-card">
+        <button class="icon-btn" id="micBtn" title="Voice Input">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <input 
+          type="text" 
+          id="userInput" 
+          class="chat-input" 
+          placeholder="Ask a question about loans, accounts, cards, or branches..."
+          autocomplete="off"
+        />
+        <button class="send-btn" id="sendBtn">
+          <span>Ask</span>
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==========================================================================
+       JAVASCRIPT / FASTAPI BACKEND INTEGRATION
+       ========================================================================== -->
+  <script>
+    // Config: Point this URL to your FastAPI endpoint (e.g., "/api/chat" or "http://localhost:8000/api/chat")
+    const FASTAPI_ENDPOINT = "/api/chat";
+
+    // DOM Elements
+    const chatMessages = document.getElementById("chatMessages");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const micBtn = document.getElementById("micBtn");
+    const clearChatBtn = document.getElementById("clearChatBtn");
+    const sidebar = document.getElementById("sidebar");
+    const toggleSidebar = document.getElementById("toggleSidebar");
+    const toggleIcon = document.getElementById("toggleIcon");
+
+    document.getElementById("initialTime").textContent = getCurrentTime();
+
+    // Event Listeners
+    sendBtn.addEventListener("click", () => handleSendMessage());
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") handleSendMessage();
+    });
+
+    clearChatBtn.addEventListener("click", () => {
+      chatMessages.innerHTML = `
+        <div class="chat-bubble assistant">
+          <div class="bubble-header">
+            <span class="bubble-author"><span class="acb-mini-badge">ACB</span> ACB Assistant</span>
+            <span>${getCurrentTime()}</span>
+          </div>
+          <div class="bubble-content">
+            <p>Chat history cleared. 👋 How can I assist you with your ACB Caribbean Bank services today?</p>
+          </div>
+        </div>
+      `;
+    });
+
+    // Sidebar Toggle
+    toggleSidebar.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      if (sidebar.classList.contains("collapsed")) {
+        toggleIcon.className = "fa-solid fa-chevron-right";
+      } else {
+        toggleIcon.className = "fa-solid fa-chevron-left";
+      }
+    });
+
+    // Quick Action Pills
+    document.querySelectorAll(".quick-pill").forEach((pill) => {
+      pill.addEventListener("click", () => {
+        const prompt = pill.getAttribute("data-prompt");
+        if (prompt) handleSendMessage(prompt);
+      });
+    });
+
+    // Voice Speech Recognition
+    let isRecording = false;
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isRecording = true;
+        micBtn.classList.add("recording");
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        micBtn.classList.remove("recording");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+      };
+
+      micBtn.addEventListener("click", () => {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          recognition.start();
+        }
+      });
+    } else {
+      micBtn.style.display = "none";
+    }
+
+    // Main Send Message Function to FastAPI
+    async function handleSendMessage(customText) {
+      const text = (customText || userInput.value).trim();
+      if (!text) return;
+
+      // 1. Append User Bubble
+      appendUserBubble(text);
+      if (!customText) userInput.value = "";
+
+      // 2. Disable Send Button
+      sendBtn.disabled = true;
+
+      // 3. Append Assistant Placeholder Bubble
+      const botContentEl = appendAssistantBubblePlaceholder();
+
+      try {
+        // 4. Send POST request to FastAPI backend
+        const response = await fetch(FASTAPI_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text })
+        });
+
+        let botReply = "";
+
+        if (response.ok) {
+          const data = await response.json();
+          // Supports FastAPI JSON keys: "reply", "response", or "answer"
+          botReply = data.reply || data.response || data.answer || "Thank you for reaching out to ACB Caribbean Bank.";
+        } else {
+          botReply = getOfflineFallbackResponse(text);
+        }
+
+        // 5. Simulate Word Typing Stream Effect
+        await typeWriterEffect(botContentEl, botReply);
+
+      } catch (error) {
+        console.warn("FastAPI endpoint fetch failed, showing fallback:", error);
+        const fallback = getOfflineFallbackResponse(text);
+        await typeWriterEffect(botContentEl, fallback);
+      } finally {
+        sendBtn.disabled = false;
+        scrollToBottom();
+      }
+    }
+
+    function appendUserBubble(text) {
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble user";
+      bubble.innerHTML = `
+        <div class="bubble-header">
+          <span class="bubble-author"><i class="fa-solid fa-user"></i> You</span>
+          <span>${getCurrentTime()}</span>
+        </div>
+        <div class="bubble-content">
+          <p>${escapeHtml(text)}</p>
+        </div>
+      `;
+      chatMessages.appendChild(bubble);
+      scrollToBottom();
+    }
+
+    function appendAssistantBubblePlaceholder() {
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble assistant";
+      bubble.innerHTML = `
+        <div class="bubble-header">
+          <span class="bubble-author"><span class="acb-mini-badge">ACB</span> ACB Assistant</span>
+          <span>${getCurrentTime()}</span>
+        </div>
+        <div class="bubble-content">
+          <p><span class="typing-cursor"></span></p>
+        </div>
+      `;
+      chatMessages.appendChild(bubble);
+      scrollToBottom();
+      return bubble.querySelector(".bubble-content");
+    }
+
+    async function typeWriterEffect(containerEl, fullText) {
+      const words = fullText.split(" ");
+      let current = "";
+      
+      for (let i = 0; i < words.length; i++) {
+        current += (i === 0 ? "" : " ") + words[i];
+        containerEl.innerHTML = `<p>${formatMarkdown(current)}<span class="typing-cursor"></span></p>`;
+        scrollToBottom();
+        await new Promise(r => setTimeout(r, 30));
+      }
+
+      containerEl.innerHTML = `<p>${formatMarkdown(fullText)}</p>`;
+    }
+
+    function getOfflineFallbackResponse(text) {
+      const lower = text.toLowerCase();
+      if (lower.includes("loan") || lower.includes("mortgage")) {
+        return "💰 ACB Caribbean Bank offers **Home Mortgages**, **Vehicle Loans**, and **Personal Loans**. Contact our loan specialists at 1-800-222-2265 or visit any branch to apply!";
+      }
+      if (lower.includes("account") || lower.includes("savings")) {
+        return "💵 We offer **Regular Savings**, **Fixed Deposits**, and **Chequing Accounts**. Visit a branch with your ID, proof of address, income proof, and TIN to register.";
+      }
+      if (lower.includes("card") || lower.includes("credit")) {
+        return "💳 We provide ACB Visa Debit and Credit Cards. If your card is lost or stolen, lock it via the ACB Mobile App or call 1-268-480-1600.";
+      }
+      if (lower.includes("location") || lower.includes("branch") || lower.includes("hour")) {
+        return "📍 ACB Caribbean Bank has branches in **Antigua** (St. John's & Village Walk), **Barbuda** (Codrington), **Grenada** (Grand Anse), and **St. Lucia** (Castries). Standard hours are Mon-Thu 8am-2pm and Fri 8am-4pm.";
+      }
+      return "Hello! 👋 I'm here to help with ACB Caribbean Bank services. Ask me about **loans**, **accounts**, **cards**, **branch locations**, or **contact info**.";
+    }
+
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function formatMarkdown(text) {
+      return escapeHtml(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>');
+    }
+  </script>
+</body>
+</html>

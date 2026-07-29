@@ -1,0 +1,10 @@
+gunicorn
+fastapi
+uvicorn[standard]
+pydantic
+# ---- add these when you upgrade graph.py to the LangGraph / AI version ----
+# langgraph
+# langchain
+# google-generativeai      # Gemini
+# openai                   # OpenAI / Z.ai-compatible
+# python-dotenv
